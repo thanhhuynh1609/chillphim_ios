@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/custom_text_field.dart';
 import '../main_navigator.dart';
 import 'register_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -84,13 +85,12 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     'Moodly',
-                    style: TextStyle(
-                      fontSize: 40,
+                    style: GoogleFonts.dancingScript(
+                      fontSize: 48,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF4F46E5),
-                      fontFamily: 'cursive',
+                      color: const Color(0xFF4F46E5),
                     ),
                   ),
                   const SizedBox(height: 32),

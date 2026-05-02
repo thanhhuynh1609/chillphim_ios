@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MusicScreen extends StatefulWidget {
   const MusicScreen({super.key});
@@ -19,7 +20,6 @@ class _MusicScreenState extends State<MusicScreen> {
   bool isUploading = false;
   File? selectedFile;
 
-  // Audio Player State
   final AudioPlayer _audioPlayer = AudioPlayer();
   String? currentlyPlayingId;
   bool isPlaying = false;
@@ -34,16 +34,9 @@ class _MusicScreenState extends State<MusicScreen> {
   void initState() {
     super.initState();
     _fetchMusicList();
-
-    // Lắng nghe trạng thái nhạc
     _audioPlayer.onPlayerStateChanged.listen((state) {
-      if (mounted) {
-        setState(() {
-          isPlaying = state == PlayerState.playing;
-        });
-      }
+      if (mounted) setState(() => isPlaying = state == PlayerState.playing);
     });
-
     _audioPlayer.onPlayerComplete.listen((event) {
       if (mounted) setState(() => isPlaying = false);
     });
@@ -59,7 +52,6 @@ class _MusicScreenState extends State<MusicScreen> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token');
     if (token == null) return;
-
     try {
       final res = await http.get(
         Uri.parse('https://moodly-backend-6fk0.onrender.com/api/photos/music/'),
@@ -68,9 +60,7 @@ class _MusicScreenState extends State<MusicScreen> {
       if (res.statusCode == 200) {
         setState(() => userMusic = jsonDecode(utf8.decode(res.bodyBytes)));
       }
-    } catch (e) {
-      debugPrint("Error fetching music: $e");
-    }
+    } catch (e) {}
   }
 
   Future<void> _pickFile() async {
@@ -82,7 +72,6 @@ class _MusicScreenState extends State<MusicScreen> {
 
   Future<void> _handleUpload() async {
     if (selectedFile == null) return;
-
     setState(() => isUploading = true);
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token');
@@ -91,22 +80,22 @@ class _MusicScreenState extends State<MusicScreen> {
       var request = http.MultipartRequest('POST', Uri.parse('https://moodly-backend-6fk0.onrender.com/api/photos/music/'));
       request.headers.addAll({'Authorization': 'Bearer $token'});
 
-      String filename = selectedFile!.path.split('/').last;
-      String title = filename.split('.').first;
+      String rawFilename = selectedFile!.path.split(Platform.isWindows ? '\\' : '/').last;
+      String title = rawFilename.split('.').first;
 
       request.fields['title'] = title;
       request.files.add(await http.MultipartFile.fromPath('audio', selectedFile!.path));
 
       var streamedResponse = await request.send();
       if (streamedResponse.statusCode == 200 || streamedResponse.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tải nhạc lên thành công!'), backgroundColor: Colors.green));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tải nhạc lên thành công!'), backgroundColor: Colors.green));
         setState(() => selectedFile = null);
         _fetchMusicList();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi khi lưu nhạc'), backgroundColor: Colors.red));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi khi lưu nhạc'), backgroundColor: Colors.red));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi kết nối'), backgroundColor: Colors.red));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi kết nối'), backgroundColor: Colors.red));
     } finally {
       setState(() => isUploading = false);
     }
@@ -129,14 +118,10 @@ class _MusicScreenState extends State<MusicScreen> {
   Future<void> _handleDelete(int id) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token');
-
     try {
       final res = await http.delete(
         Uri.parse('https://moodly-backend-6fk0.onrender.com/api/photos/music/'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json'
-        },
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
         body: jsonEncode({"id": id}),
       );
       if (res.statusCode == 200 || res.statusCode == 204) {
@@ -146,9 +131,7 @@ class _MusicScreenState extends State<MusicScreen> {
         }
         _fetchMusicList();
       }
-    } catch (e) {
-      debugPrint("Error deleting: $e");
-    }
+    } catch (e) {}
   }
 
   @override
@@ -160,7 +143,7 @@ class _MusicScreenState extends State<MusicScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Moodly Playlist', style: TextStyle(fontSize: 26, color: Color(0xFF4F46E5), fontFamily: 'cursive', fontWeight: FontWeight.bold)),
+        title: Text('Moodly Playlist', style: GoogleFonts.dancingScript(fontSize: 32, color: const Color(0xFF4F46E5), fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: Padding(
@@ -168,7 +151,6 @@ class _MusicScreenState extends State<MusicScreen> {
         child: Column(
           children: [
             const SizedBox(height: 10),
-            // Nút chuyển Tab
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(12)),
@@ -200,8 +182,6 @@ class _MusicScreenState extends State<MusicScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Box Upload (Chỉ hiện ở Tab Nhạc của bạn)
             if (isUserTab) ...[
               Row(
                 children: [
@@ -222,7 +202,7 @@ class _MusicScreenState extends State<MusicScreen> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                selectedFile != null ? selectedFile!.path.split('/').last : 'Thêm bài hát mới (.mp3)',
+                                selectedFile != null ? selectedFile!.path.split(Platform.isWindows ? '\\' : '/').last : 'Thêm bài hát mới (.mp3)',
                                 style: const TextStyle(color: Color(0xFF4F46E5), fontWeight: FontWeight.bold),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -248,8 +228,6 @@ class _MusicScreenState extends State<MusicScreen> {
               ),
               const SizedBox(height: 24),
             ],
-
-            // Danh sách nhạc
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(16),
@@ -267,10 +245,7 @@ class _MusicScreenState extends State<MusicScreen> {
 
                     return Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: isActive ? themeColor.withOpacity(0.1) : Colors.transparent,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      decoration: BoxDecoration(color: isActive ? themeColor.withOpacity(0.1) : Colors.transparent, borderRadius: BorderRadius.circular(12)),
                       child: Row(
                         children: [
                           GestureDetector(
@@ -279,20 +254,11 @@ class _MusicScreenState extends State<MusicScreen> {
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(color: isActive ? themeColor : Colors.grey.shade100, shape: BoxShape.circle),
-                              child: Icon(
-                                isActive && isPlaying ? Icons.pause : Icons.play_arrow,
-                                color: isActive ? Colors.white : themeColor,
-                              ),
+                              child: Icon(isActive && isPlaying ? Icons.pause : Icons.play_arrow, color: isActive ? Colors.white : themeColor),
                             ),
                           ),
                           const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              song['title'],
-                              style: TextStyle(fontWeight: FontWeight.bold, color: isActive ? themeColor : Colors.grey.shade800),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                          Expanded(child: Text(song['title'], style: TextStyle(fontWeight: FontWeight.bold, color: isActive ? themeColor : Colors.grey.shade800), overflow: TextOverflow.ellipsis)),
                           if (isUserTab)
                             IconButton(
                               icon: const Icon(Icons.delete_outline, color: Colors.grey),
@@ -323,7 +289,7 @@ class _MusicScreenState extends State<MusicScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 100), // Khoảng trống cho Bottom Nav nổi
+            const SizedBox(height: 100),
           ],
         ),
       ),

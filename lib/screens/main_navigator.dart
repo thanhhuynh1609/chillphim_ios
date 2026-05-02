@@ -1,6 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'home/home_screen.dart';
 import 'music/music_screen.dart';
+import 'profile/profile_screen.dart';
 
 class MainNavigator extends StatefulWidget {
   const MainNavigator({super.key});
@@ -12,62 +14,77 @@ class MainNavigator extends StatefulWidget {
 class _MainNavigatorState extends State<MainNavigator> {
   int _currentIndex = 0;
 
-  // Danh sách các màn hình tương ứng với các tab
   final List<Widget> _screens = [
     const HomePage(),
-    const Center(child: Text('Màn hình Chi tiêu (Coming soon)')), // Tab Chi tiêu
+    const Center(child: Text('Chi tiêu')),
+    const Scaffold(),
     const MusicScreen(),
-    const Center(child: Text('Màn hình Cá nhân (Coming soon)')), // Tab Cá nhân
+    const ProfilePage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true, // Cho phép body chìm xuống dưới thanh nav
+      extendBody: true,
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
       ),
-      // Custom Bottom Navigation Bar nổi lên như thiết kế
       bottomNavigationBar: SafeArea(
         child: Container(
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.95),
-            borderRadius: BorderRadius.circular(40),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          height: 70,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
             children: [
-              _buildNavItem(0, Icons.home_filled, 'Trang chủ'),
-              _buildNavItem(1, Icons.account_balance_wallet, 'Chi tiêu'),
-
-              // Nút Tạo (+) ở giữa
-              GestureDetector(
-                onTap: () {
-                  // TODO: Xử lý sự kiện mở bottom sheet tạo mới
-                },
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF8B5CF6), // Màu tím đậm giống ảnh
-                    shape: BoxShape.circle,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(40),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.85),
+                      borderRadius: BorderRadius.circular(40),
+                      border: Border.all(color: Colors.white.withOpacity(0.4), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10)),
+                      ],
+                    ),
                   ),
-                  child: const Icon(Icons.add, color: Colors.white, size: 30),
                 ),
               ),
-
-              _buildNavItem(2, Icons.music_note, 'Nhạc'),
-              _buildNavItem(3, Icons.person, 'Cá Nhân'),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildNavItem(0, Icons.home_outlined, Icons.home_filled, 'Trang chủ'),
+                    _buildNavItemWithBadge(1, Icons.account_balance_wallet_outlined, Icons.account_balance_wallet, 'Chi tiêu'),
+                    const SizedBox(width: 60),
+                    _buildNavItem(3, Icons.music_note_outlined, Icons.music_note, 'Nhạc'),
+                    _buildNavItem(4, Icons.person_outline, Icons.person, 'Cá Nhân'),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: -20,
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF8B5CF6),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(color: const Color(0xFF8B5CF6).withOpacity(0.4), blurRadius: 15, spreadRadius: 2, offset: const Offset(0, 8)),
+                      ],
+                    ),
+                    child: const Icon(Icons.add, color: Colors.white, size: 32),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -75,29 +92,87 @@ class _MainNavigatorState extends State<MainNavigator> {
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label) {
+  Widget _buildNavItem(int index, IconData iconOutlined, IconData iconFilled, String label) {
     final isSelected = _currentIndex == index;
+    final color = isSelected ? const Color(0xFF4F46E5) : Colors.black87;
+
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
       behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? const Color(0xFF4F46E5) : Colors.grey.shade500,
-            size: 26,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? const Color(0xFF4F46E5) : Colors.grey.shade600,
+      child: SizedBox(
+        width: 65,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(isSelected ? iconFilled : iconOutlined, color: color, size: 26),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                color: color,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: 3,
+              width: isSelected ? 20 : 0,
+              decoration: BoxDecoration(color: const Color(0xFF4F46E5), borderRadius: BorderRadius.circular(2)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItemWithBadge(int index, IconData iconOutlined, IconData iconFilled, String label) {
+    final isSelected = _currentIndex == index;
+    final color = isSelected ? const Color(0xFF4F46E5) : Colors.black87;
+
+    return GestureDetector(
+      onTap: () => setState(() => _currentIndex = index),
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 65,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(isSelected ? iconFilled : iconOutlined, color: color, size: 26),
+                Positioned(
+                  top: -2,
+                  right: -4,
+                  child: Container(
+                    width: 14,
+                    height: 14,
+                    decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 1.5)),
+                    child: const Icon(Icons.priority_high, color: Colors.white, size: 8),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 4),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: 3,
+              width: isSelected ? 20 : 0,
+              decoration: BoxDecoration(color: const Color(0xFF4F46E5), borderRadius: BorderRadius.circular(2)),
+            ),
+          ],
+        ),
       ),
     );
   }
