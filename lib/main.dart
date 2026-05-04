@@ -21,7 +21,14 @@ class MoodlyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4F46E5)),
         fontFamily: 'Roboto',
       ),
-      // Thay vì vào thẳng Login, ta sẽ cho nó qua Trạm Kiểm Soát
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: const TextScaler.linear(1.0),
+          ),
+          child: child!,
+        );
+      },
       home: const AuthCheckScreen(),
     );
   }

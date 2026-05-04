@@ -7,7 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/transaction_model.dart';
 import '../auth/login_screen.dart';
 import 'daily_spending_screen.dart';
-import 'new_transaction_screen.dart';
+import 'camera_capture_screen.dart';
 
 class SpendingHomeScreen extends StatefulWidget {
   const SpendingHomeScreen({super.key});
@@ -112,7 +112,7 @@ class _SpendingHomeScreenState extends State<SpendingHomeScreen> {
     if (hasPhotos) {
       Navigator.push(context, MaterialPageRoute(builder: (_) => DailySpendingScreen(dateStr: targetDate))).then((_) => _fetchAllTransactions());
     } else {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => NewTransactionScreen(dateStr: targetDate))).then((_) => _fetchAllTransactions());
+      Navigator.push(context, MaterialPageRoute(builder: (_) => CameraCaptureScreen(dateStr: targetDate))).then((_) => _fetchAllTransactions());
     }
   }
 
@@ -388,11 +388,11 @@ class _SpendingHomeScreenState extends State<SpendingHomeScreen> {
         ),
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 90.0),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewPadding.bottom + 90),
         child: FloatingActionButton(
           onPressed: () {
             final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
-            Navigator.push(context, MaterialPageRoute(builder: (_) => NewTransactionScreen(dateStr: todayStr))).then((_) => _fetchAllTransactions());
+            Navigator.push(context, MaterialPageRoute(builder: (_) => CameraCaptureScreen(dateStr: todayStr))).then((_) => _fetchAllTransactions());
           },
           backgroundColor: const Color(0xFF4F46E5),
           child: const Icon(Icons.add, color: Colors.white, size: 30),

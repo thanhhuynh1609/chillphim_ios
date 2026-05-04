@@ -7,6 +7,7 @@ class TransactionModel {
   final String note;
   final String? imageUrl;
   final String transactionDate;
+  final String? createdAt;
 
   TransactionModel({
     required this.id,
@@ -17,6 +18,7 @@ class TransactionModel {
     required this.note,
     this.imageUrl,
     required this.transactionDate,
+    this.createdAt,
   });
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class TransactionModel {
       note: json['note'] ?? '',
       imageUrl: json['image_url'],
       transactionDate: json['transaction_date'] ?? DateTime.now().toIso8601String(),
+      createdAt: json['created_at'],
     );
   }
 }

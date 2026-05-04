@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/transaction_model.dart';
 import 'new_transaction_screen.dart';
+import 'camera_capture_screen.dart';
 
 class DailySpendingScreen extends StatefulWidget {
   final String dateStr;
@@ -167,7 +168,16 @@ class _DailySpendingScreenState extends State<DailySpendingScreen> {
                                       children: [
                                         Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4)), child: Text(tx.source.toUpperCase(), style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey))),
                                         const SizedBox(width: 8),
-                                        Text(DateFormat('HH:mm').format(DateTime.parse(tx.transactionDate)), style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                                        Text(
+                                          DateFormat('HH:mm').format(
+                                            (tx.createdAt != null
+                                                    ? DateTime.parse(tx.createdAt!)
+                                                    : DateTime.parse(tx.transactionDate))
+                                                .toUtc()
+                                                .add(const Duration(hours: 7)),
+                                          ),
+                                          style: const TextStyle(fontSize: 10, color: Colors.grey),
+                                        ),
                                       ],
                                     )
                                   ],
@@ -205,11 +215,11 @@ class _DailySpendingScreenState extends State<DailySpendingScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => NewTransactionScreen(dateStr: widget.dateStr))).then((_) => _fetchDailyTransactions());
-        },
-        backgroundColor: const Color(0xFF4F46E5),
-        child: const Icon(Icons.add, color: Colors.white, size: 30),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => CameraCaptureScreen(dateStr: widget.dateStr))).then((_) => _fetchDailyTransactions());
+          },
+          backgroundColor: const Color(0xFF4F46E5),
+          child: const Icon(Icons.add, color: Colors.white, size: 30),
       ),
     );
   }

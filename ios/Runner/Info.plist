@@ -45,5 +45,13 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Moodly cần quyền camera để chụp ảnh hóa đơn chi tiêu.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Moodly cần quyền truy cập thư viện ảnh để đính kèm ảnh hóa đơn.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Moodly cần quyền lưu ảnh vào thư viện.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Moodly cần quyền micro khi sử dụng camera.</string>
 </dict>
 </plist>
