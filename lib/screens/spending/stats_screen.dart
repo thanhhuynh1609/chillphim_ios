@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import '../../widgets/app_toast.dart';
 
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
@@ -50,7 +51,7 @@ class _StatsScreenState extends State<StatsScreen> {
         setState(() => transactions = data is List ? data : (data['results'] ?? []));
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi tải dữ liệu')));
+      if (mounted) AppToast.error(context, 'Lỗi tải dữ liệu');
     } finally {
       setState(() => isLoading = false);
     }

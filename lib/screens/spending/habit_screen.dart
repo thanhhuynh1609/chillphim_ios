@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
+import '../../widgets/app_toast.dart';
 
 class HabitScreen extends StatefulWidget {
   const HabitScreen({super.key});
@@ -165,13 +166,7 @@ class _HabitScreenState extends State<HabitScreen> {
       );
       if (res.statusCode == 200) {
         if (action == 'toggle' && !currentDone && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('🔥 +1 Kỷ luật!'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 2),
-            ),
-          );
+          AppToast.show(context, '🔥 +1 Kỷ luật!', type: ToastType.warning);
         }
         // Sync with server to get accurate state (streak, etc.)
         await _fetchHabits();
@@ -789,7 +784,7 @@ class _HabitScreenState extends State<HabitScreen> {
         ),
       ),
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewPadding.bottom + 90),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewPadding.bottom + 100),
         child: FloatingActionButton(
           onPressed: () {
             setState(() {

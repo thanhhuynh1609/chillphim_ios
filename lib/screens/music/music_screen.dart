@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../widgets/app_toast.dart';
 
 class MusicScreen extends StatefulWidget {
   const MusicScreen({super.key});
@@ -88,14 +89,14 @@ class _MusicScreenState extends State<MusicScreen> {
 
       var streamedResponse = await request.send();
       if (streamedResponse.statusCode == 200 || streamedResponse.statusCode == 201) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tải nhạc lên thành công!'), backgroundColor: Colors.green));
+        if (mounted) AppToast.success(context, 'Tải nhạc lên thành công!');
         setState(() => selectedFile = null);
         _fetchMusicList();
       } else {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi khi lưu nhạc'), backgroundColor: Colors.red));
+        if (mounted) AppToast.error(context, 'Lỗi khi lưu nhạc');
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi kết nối'), backgroundColor: Colors.red));
+      if (mounted) AppToast.error(context, 'Lỗi kết nối');
     } finally {
       setState(() => isUploading = false);
     }

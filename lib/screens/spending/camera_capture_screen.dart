@@ -2,11 +2,17 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../widgets/app_toast.dart';
 import 'new_transaction_screen.dart';
 
 class CameraCaptureScreen extends StatefulWidget {
   final String dateStr;
-  const CameraCaptureScreen({super.key, required this.dateStr});
+  final VoidCallback? onTransactionSaved;
+  const CameraCaptureScreen({
+    super.key,
+    required this.dateStr,
+    this.onTransactionSaved,
+  });
 
   @override
   State<CameraCaptureScreen> createState() => _CameraCaptureScreenState();
@@ -53,7 +59,8 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
       if (_cameras.isEmpty) return;
       // prefer back camera
       final backIndex = _cameras.indexWhere(
-          (c) => c.lensDirection == CameraLensDirection.back);
+        (c) => c.lensDirection == CameraLensDirection.back,
+      );
       _cameraIndex = backIndex >= 0 ? backIndex : 0;
       await _startCamera(_cameras[_cameraIndex]);
     } catch (e) {
@@ -86,11 +93,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
       final XFile file = await ctrl.takePicture();
       if (mounted) _openForm(File(file.path));
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Lỗi chụp ảnh'), backgroundColor: Colors.red),
-        );
-      }
+      if (mounted) AppToast.error(context, 'Lỗi chụp ảnh');
     } finally {
       if (mounted) setState(() => _isTaking = false);
     }
@@ -112,15 +115,13 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
 
   Future<void> _pickFromGallery() async {
     try {
-      final XFile? file = await ImagePicker()
-          .pickImage(source: ImageSource.gallery, imageQuality: 75);
+      final XFile? file = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 75,
+      );
       if (file != null && mounted) _openForm(File(file.path));
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
-        );
-      }
+      if (mounted) AppToast.error(context, 'Lỗi: $e');
     }
   }
 
@@ -135,6 +136,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
         builder: (_) => NewTransactionScreen(
           dateStr: widget.dateStr,
           initialPhoto: photo,
+          onSaved: widget.onTransactionSaved,
         ),
       ),
     );
@@ -157,11 +159,14 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
                       _controller?.dispose();
                       Navigator.pop(context);
                     },
-                    child: const Text('Hủy',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600)),
+                    child: const Text(
+                      'Hủy',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -177,13 +182,25 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
                     fit: StackFit.expand,
                     children: [
                       // Preview or loading
+                      // Preview or loading
                       if (_isInitialized && _controller != null)
-                        CameraPreview(_controller!)
+                        FittedBox(
+                          fit: BoxFit
+                              .cover, 
+                          child: SizedBox(
+                            width: 100, 
+                            
+                            height: 100 * _controller!.value.aspectRatio,
+                            child: CameraPreview(_controller!),
+                          ),
+                        )
                       else
                         Container(
                           color: const Color(0xFF0A0A0C),
                           child: const Center(
-                            child: CircularProgressIndicator(color: Colors.white54),
+                            child: CircularProgressIndicator(
+                              color: Colors.white54,
+                            ),
                           ),
                         ),
 
@@ -196,8 +213,14 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: const BoxDecoration(
-                                color: Colors.black45, shape: BoxShape.circle),
-                            child: Icon(_flashIcon(), color: Colors.white, size: 22),
+                              color: Colors.black45,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _flashIcon(),
+                              color: Colors.white,
+                              size: 22,
+                            ),
                           ),
                         ),
                       ),
@@ -211,9 +234,14 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: const BoxDecoration(
-                                color: Colors.black45, shape: BoxShape.circle),
-                            child: const Icon(Icons.flip_camera_ios_outlined,
-                                color: Colors.white, size: 22),
+                              color: Colors.black45,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.flip_camera_ios_outlined,
+                              color: Colors.white,
+                              size: 22,
+                            ),
                           ),
                         ),
                       ),
@@ -234,22 +262,32 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
                     child: Container(
                       width: 76,
                       height: 76,
-                      decoration: BoxDecoration(
+                      padding: const EdgeInsets.all(3),
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                           colors: [Color(0xFF8B5CF6), Color(0xFFEC4899)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        border: Border.all(color: Colors.white, width: 3),
                       ),
-                      child: _isTaking
-                          ? const Padding(
-                              padding: EdgeInsets.all(20),
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2.5),
-                            )
-                          : const SizedBox(),
+                      // Lớp Container bên trong là lõi của nút
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors
+                              .white, // Bỏ dòng này đi nếu bạn muốn viền và lõi dính liền nhau (nhưng như thế sẽ không thấy viền đâu)
+                        ),
+                        child: _isTaking
+                            ? const Padding(
+                                padding: EdgeInsets.all(20),
+                                child: CircularProgressIndicator(
+                                  color: Color(0xFF8B5CF6),
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                            : const SizedBox(),
+                      ),
                     ),
                   ),
 
@@ -259,7 +297,10 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
                   GestureDetector(
                     onTap: _pickFromGallery,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 13),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 28,
+                        vertical: 13,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(30),
@@ -267,14 +308,20 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.photo_library_outlined,
-                              color: Colors.white, size: 18),
+                          Icon(
+                            Icons.photo_library_outlined,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                           SizedBox(width: 8),
-                          Text('Chọn từ thư viện',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15)),
+                          Text(
+                            'Chọn từ thư viện',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -285,8 +332,10 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen>
                   // Skip
                   TextButton(
                     onPressed: _skipPhoto,
-                    child: const Text('Bỏ qua ảnh',
-                        style: TextStyle(color: Colors.white54, fontSize: 14)),
+                    child: const Text(
+                      'Bỏ qua ảnh',
+                      style: TextStyle(color: Colors.white54, fontSize: 14),
+                    ),
                   ),
                 ],
               ),

@@ -6,6 +6,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../models/photo_model.dart';
+import '../../widgets/app_toast.dart';
 import '../auth/login_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -91,7 +92,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi kết nối máy chủ!')));
+      AppToast.error(context, 'Lỗi kết nối máy chủ!');
     } finally {
       setState(() {
         isLoadingMore = false;
@@ -148,7 +149,7 @@ class _HomePageState extends State<HomePage> {
         _fetchPhotos(1);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi khi xóa ảnh!')));
+      AppToast.error(context, 'Lỗi khi xóa ảnh!');
     }
   }
 

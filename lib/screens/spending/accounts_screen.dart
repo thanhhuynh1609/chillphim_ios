@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import '../../widgets/app_toast.dart';
 
 class AccountsScreen extends StatefulWidget {
   const AccountsScreen({super.key});
@@ -115,7 +116,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
       );
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cập nhật thành công!'), backgroundColor: Colors.green));
+        if (mounted) AppToast.success(context, 'Cập nhật thành công!');
         _fetchBalances();
         setState(() => isModalOpen = false);
       }
@@ -133,7 +134,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
     final currentSourceBalance = sourceAcc == 'bank' ? bankBalance : walletBalance;
 
     if (amount > currentSourceBalance) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Số dư nguồn không đủ!'), backgroundColor: Colors.red));
+      AppToast.error(context, 'Số dư nguồn không đủ!');
       return;
     }
 
@@ -160,7 +161,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
       final res2 = await createTx('income', destAcc, 'Nhận từ ${sourceAcc == 'wallet' ? 'Tiền mặt' : 'Ngân hàng'}');
 
       if (res1.statusCode == 201 && res2.statusCode == 201) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Chuyển tiền thành công!'), backgroundColor: Colors.green));
+        if (mounted) AppToast.success(context, 'Chuyển tiền thành công!');
         _fetchBalances();
         setState(() {
           isTransferModalOpen = false;

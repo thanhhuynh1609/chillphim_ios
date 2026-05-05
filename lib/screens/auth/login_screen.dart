@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/custom_text_field.dart';
+import '../../widgets/app_toast.dart';
 import '../main_navigator.dart';
 import 'register_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,36 +46,17 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setString('refresh_token', data['refresh'] ?? '');
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Đăng nhập thành công!'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          AppToast.success(context, 'Đăng nhập thành công!');
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const MainNavigator()),
           );
         }
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Sai username hoặc password!'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+        if (mounted) AppToast.error(context, 'Sai username hoặc password!');
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Lỗi kết nối máy chủ!'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      if (mounted) AppToast.error(context, 'Lỗi kết nối máy chủ!');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

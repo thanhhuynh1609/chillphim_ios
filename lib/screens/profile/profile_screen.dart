@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
+import '../../widgets/app_toast.dart';
 import '../auth/login_screen.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -72,12 +73,12 @@ class _ProfilePageState extends State<ProfilePage> {
         var response = await http.Response.fromStream(streamedResponse);
         final data = jsonDecode(response.body);
         setState(() => avatarUrl = data['avatar_url']);
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cập nhật ảnh thành công!'), backgroundColor: Colors.green));
+        if (mounted) AppToast.success(context, 'Cập nhật ảnh thành công!');
       } else {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi tải ảnh'), backgroundColor: Colors.red));
+        if (mounted) AppToast.error(context, 'Lỗi tải ảnh');
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi kết nối'), backgroundColor: Colors.red));
+      if (mounted) AppToast.error(context, 'Lỗi kết nối');
     } finally {
       setState(() => isUploading = false);
     }
@@ -101,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage> {
       );
 
       if (res.statusCode == 200) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đổi mật khẩu thành công!'), backgroundColor: Colors.green));
+        if (mounted) AppToast.success(context, 'Đổi mật khẩu thành công!');
         setState(() {
           _oldPasswordController.clear();
           _newPasswordController.clear();
@@ -109,10 +110,10 @@ class _ProfilePageState extends State<ProfilePage> {
         });
       } else {
         final errorData = jsonDecode(res.body);
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorData['error'] ?? 'Đổi mật khẩu thất bại.'), backgroundColor: Colors.red));
+        if (mounted) AppToast.error(context, errorData['error'] ?? 'Đổi mật khẩu thất bại.');
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lỗi kết nối'), backgroundColor: Colors.red));
+      if (mounted) AppToast.error(context, 'Lỗi kết nối');
     }
   }
 
@@ -124,7 +125,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _handleComingSoon() {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🚧 Tính năng đang phát triển')));
+    AppToast.show(context, '🚧 Tính năng đang phát triển');
   }
 
   Widget _buildMenuRow(IconData icon, String label, {String value = "", required VoidCallback onClick, bool isLast = false, Color color = Colors.grey}) {

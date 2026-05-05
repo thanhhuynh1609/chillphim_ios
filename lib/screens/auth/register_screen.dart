@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../widgets/custom_text_field.dart';
+import '../../widgets/app_toast.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -21,7 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
     if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) return;
 
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mật khẩu không khớp!'), backgroundColor: Colors.red));
+      AppToast.error(context, 'Mật khẩu không khớp!');
       return;
     }
 
@@ -39,26 +40,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đăng ký thành công! Đang chuyển hướng...'), backgroundColor: Colors.green),
-          );
+          AppToast.success(context, 'Đăng ký thành công! Đang chuyển hướng...');
           Future.delayed(const Duration(seconds: 1), () {
-            Navigator.pop(context);
+            if (mounted) Navigator.pop(context);
           });
         }
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi đăng ký: ${response.body}'), backgroundColor: Colors.red),
-          );
-        }
+        if (mounted) AppToast.error(context, 'Lỗi đăng ký: ${response.body}');
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Lỗi kết nối máy chủ!'), backgroundColor: Colors.red),
-        );
-      }
+      if (mounted) AppToast.error(context, 'Lỗi kết nối máy chủ!');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/transaction_model.dart';
+import '../../widgets/app_toast.dart';
 import 'new_transaction_screen.dart';
 import 'camera_capture_screen.dart';
 
@@ -84,7 +85,7 @@ class _DailySpendingScreenState extends State<DailySpendingScreen> {
       );
       if (res.statusCode == 204 || res.statusCode == 200) {
         setState(() => transactions.removeWhere((t) => t.id == id));
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đã xóa thành công!')));
+        if (mounted) AppToast.success(context, 'Đã xóa thành công!');
       }
     } catch (e) {}
   }
@@ -140,7 +141,13 @@ class _DailySpendingScreenState extends State<DailySpendingScreen> {
                           if (tx.imageUrl != null) {
                             setState(() => zoomedImage = tx.imageUrl);
                           } else {
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => NewTransactionScreen(dateStr: widget.dateStr, editId: tx.id))).then((_) => _fetchDailyTransactions());
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (_) => NewTransactionScreen(
+                                dateStr: widget.dateStr,
+                                editId: tx.id,
+                                onSaved: _fetchDailyTransactions,
+                              ),
+                            ));
                           }
                         },
                         child: Container(
@@ -216,7 +223,12 @@ class _DailySpendingScreenState extends State<DailySpendingScreen> {
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => CameraCaptureScreen(dateStr: widget.dateStr))).then((_) => _fetchDailyTransactions());
+            Navigator.push(context, MaterialPageRoute(
+              builder: (_) => CameraCaptureScreen(
+                dateStr: widget.dateStr,
+                onTransactionSaved: _fetchDailyTransactions,
+              ),
+            ));
           },
           backgroundColor: const Color(0xFF4F46E5),
           child: const Icon(Icons.add, color: Colors.white, size: 30),

@@ -110,9 +110,16 @@ class _SpendingHomeScreenState extends State<SpendingHomeScreen> {
   void _handleDayClick(int day, bool hasPhotos) {
     final targetDate = DateFormat('yyyy-MM-dd').format(DateTime(currentDate.year, currentDate.month, day));
     if (hasPhotos) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => DailySpendingScreen(dateStr: targetDate))).then((_) => _fetchAllTransactions());
+      Navigator.push(context, MaterialPageRoute(
+        builder: (_) => DailySpendingScreen(dateStr: targetDate),
+      )).then((_) => _fetchAllTransactions());
     } else {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => CameraCaptureScreen(dateStr: targetDate))).then((_) => _fetchAllTransactions());
+      Navigator.push(context, MaterialPageRoute(
+        builder: (_) => CameraCaptureScreen(
+          dateStr: targetDate,
+          onTransactionSaved: _fetchAllTransactions,
+        ),
+      ));
     }
   }
 
@@ -388,7 +395,7 @@ class _SpendingHomeScreenState extends State<SpendingHomeScreen> {
         ),
       ),
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewPadding.bottom + 90),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewPadding.bottom + 100),
         child: FloatingActionButton(
           onPressed: () {
             final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
