@@ -130,9 +130,19 @@ class _DailySpendingScreenState extends State<DailySpendingScreen> {
                 ),
                 const SizedBox(height: 16),
                 Expanded(
-                  child: transactions.isEmpty
-                      ? const Center(child: Text('Chưa có chi tiêu nào trong ngày này.', style: TextStyle(color: Colors.grey)))
+                  child: RefreshIndicator(
+                    onRefresh: _fetchDailyTransactions,
+                    color: const Color(0xFF4F46E5),
+                    child: transactions.isEmpty
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: const [
+                            SizedBox(height: 120),
+                            Center(child: Text('Chưa có chi tiêu nào trong ngày này.', style: TextStyle(color: Colors.grey))),
+                          ],
+                        )
                       : ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: transactions.length,
                     itemBuilder: (context, index) {
                       final tx = transactions[index];
@@ -200,6 +210,7 @@ class _DailySpendingScreenState extends State<DailySpendingScreen> {
                         ),
                       );
                     },
+                  ),
                   ),
                 ),
               ],

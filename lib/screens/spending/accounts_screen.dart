@@ -180,7 +180,11 @@ class _AccountsScreenState extends State<AccountsScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            SingleChildScrollView(
+            RefreshIndicator(
+              onRefresh: _fetchBalances,
+              color: const Color(0xFF4F46E5),
+              child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,6 +286,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                   )
                 ],
               ),
+            ),
             ),
 
             if (isModalOpen) _buildEditBalanceModal(),

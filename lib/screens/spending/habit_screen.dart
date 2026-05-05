@@ -445,7 +445,11 @@ class _HabitScreenState extends State<HabitScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            SingleChildScrollView(
+            RefreshIndicator(
+              onRefresh: _fetchHabits,
+              color: const Color(0xFF4F46E5),
+              child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -654,6 +658,7 @@ class _HabitScreenState extends State<HabitScreen> {
                 ],
               ),
             ),
+            ),
 
             // Timer Overlay
             if (timerHabit != null)
@@ -784,7 +789,7 @@ class _HabitScreenState extends State<HabitScreen> {
         ),
       ),
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewPadding.bottom + 100),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewPadding.bottom + 120),
         child: FloatingActionButton(
           onPressed: () {
             setState(() {

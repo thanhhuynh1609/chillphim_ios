@@ -198,29 +198,41 @@ class _StatsScreenState extends State<StatsScreen> {
             ),
 
             Expanded(
+              child: RefreshIndicator(
+              onRefresh: _fetchTransactions,
+              color: const Color(0xFF4F46E5),
               child: isLoading
-                  ? const Center(child: CircularProgressIndicator(color: Color(0xFF4F46E5)))
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: const [SizedBox(height: 200, child: Center(child: CircularProgressIndicator(color: Color(0xFF4F46E5))))],
+                    )
                   : (totalAmount == 0 || categoriesList.isEmpty)
-                  ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(top: 24),
-                  padding: const EdgeInsets.symmetric(vertical: 40),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(32), border: Border.all(color: Colors.grey.shade200, style: BorderStyle.solid)),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(width: 64, height: 64, decoration: BoxDecoration(color: Colors.grey.shade50, shape: BoxShape.circle), child: Icon(Icons.receipt_long, color: Colors.grey.shade300, size: 32)),
-                      const SizedBox(height: 16),
-                      const Text('Chưa có dữ liệu', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                      const SizedBox(height: 4),
-                      Text('Không có khoản ${activeTab == 'expense' ? 'chi' : 'thu'} nào trong tháng này.', style: TextStyle(fontSize: 12, color: Colors.grey.shade400)),
-                    ],
-                  ),
-                ),
-              )
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(top: 24),
+                            padding: const EdgeInsets.symmetric(vertical: 40),
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(32), border: Border.all(color: Colors.grey.shade200, style: BorderStyle.solid)),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(width: 64, height: 64, decoration: BoxDecoration(color: Colors.grey.shade50, shape: BoxShape.circle), child: Icon(Icons.receipt_long, color: Colors.grey.shade300, size: 32)),
+                                const SizedBox(height: 16),
+                                const Text('Chưa có dữ liệu', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+                                const SizedBox(height: 4),
+                                Text('Không có khoản ${activeTab == 'expense' ? 'chi' : 'thu'} nào trong tháng này.', style: TextStyle(fontSize: 12, color: Colors.grey.shade400)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
                   : SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.only(left: 20, right: 20, bottom: 120),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,6 +340,7 @@ class _StatsScreenState extends State<StatsScreen> {
                     )
                   ],
                 ),
+              ),
               ),
             ),
           ],

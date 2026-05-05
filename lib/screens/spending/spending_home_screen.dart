@@ -259,7 +259,11 @@ class _SpendingHomeScreenState extends State<SpendingHomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: RefreshIndicator(
+          onRefresh: _fetchAllTransactions,
+          color: const Color(0xFF4F46E5),
+          child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 120),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,13 +397,19 @@ class _SpendingHomeScreenState extends State<SpendingHomeScreen> {
             ],
           ),
         ),
+        ),
       ),
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewPadding.bottom + 100),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewPadding.bottom + 120),
         child: FloatingActionButton(
           onPressed: () {
             final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
-            Navigator.push(context, MaterialPageRoute(builder: (_) => CameraCaptureScreen(dateStr: todayStr))).then((_) => _fetchAllTransactions());
+            Navigator.push(context, MaterialPageRoute(
+              builder: (_) => CameraCaptureScreen(
+                dateStr: todayStr,
+                onTransactionSaved: _fetchAllTransactions,
+              ),
+            ));
           },
           backgroundColor: const Color(0xFF4F46E5),
           child: const Icon(Icons.add, color: Colors.white, size: 30),
