@@ -20,8 +20,8 @@ class _MainNavigatorState extends State<MainNavigator> {
     const SpendingHomeScreen(),
     const StatsScreen(),
     const AccountsScreen(),
-    const HabitScreen(),
     const ProfilePage(),
+    const HabitScreen(),
   ];
 
   @override
@@ -66,8 +66,8 @@ class _MainNavigatorState extends State<MainNavigator> {
                 _buildNavItem(0, Icons.calendar_month_outlined, Icons.calendar_month, 'Lịch'),
                 _buildNavItem(1, Icons.pie_chart_outline, Icons.pie_chart, 'Thống kê'),
                 _buildNavItem(2, Icons.receipt_long_outlined, Icons.receipt_long, 'Tài khoản'),
-                _buildNavItem(3, Icons.local_fire_department_outlined, Icons.local_fire_department, 'Giữ lửa'),
-                _buildNavItem(4, Icons.person_outline, Icons.person, 'Cá nhân'),
+                // _buildNavItem(3, Icons.local_fire_department_outlined, Icons.local_fire_department, 'Giữ lửa'),
+                _buildNavItem(3, Icons.person_outline, Icons.person, 'Cá nhân'),
               ],
             ),
           ),
